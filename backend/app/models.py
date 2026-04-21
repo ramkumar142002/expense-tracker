@@ -1,6 +1,6 @@
 from datetime import date as dt_date
 
-from sqlalchemy import Float, String, Date, ForeignKey, BigInteger
+from sqlalchemy import Boolean, Float, String, Date, ForeignKey, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -17,6 +17,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_superuser: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
 
 class Expense(Base):
