@@ -17,6 +17,11 @@ class UserCreate(BaseModel):
     password: str
 
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
 class UserResponse(BaseModel):
     id: int
     username: str
@@ -100,3 +105,24 @@ def list_users(db: Annotated[Session, Depends(get_db)]):
         )
         for user in users
     ]
+
+
+@app.post(
+    "/login",
+    response_model=UserResponse,
+    responses={401: {"description": "Invalid credentials"}},
+)
+def login(payload: LoginRequest, db: Annotated[Session, Depends(get_db)]):
+    user = db.query(models.User).filter(
+        models.User.username == payload.username.strip()
+    ).first()
+
+    if not user or user.password_hash != hash_password(payload.password):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+
+    return UserResponse(
+        id=user.id,
+        username=user.username,
+        email=user.email,
+        created_at=user.created_at,
+    )
